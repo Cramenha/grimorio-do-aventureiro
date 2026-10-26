@@ -54,7 +54,7 @@ Tudo vem do 4e Database do iws.mx (fonte não oficial de terceiros). O aplicativ
 
 ### 6. Roll20 sem digitar nada
 - Botão discreto **R20** em cada poder, talento, item mágico e passiva: copia a macro `&{template:dnd4epower}` pronta, com ataque, dano, crítico (dano máximo), ataques múltiplos em áreas e alcance. Dano com duas armas (como o Whirling Frenzy) usa as duas armas.
-- **📋 Copiar p/ Roll20** monta a **ficha completa** com os campos da ficha oficial "D&D 4E": atributos, defesas, perícias, armas, poderes e habilidades. Funciona com o script de API (plano Pro) ou com uma **extensão para navegadores Chrome/Brave** que acompanha o pacote (sem Pro).
+- **📋 Copiar p/ Roll20** monta a **ficha completa** com os campos da ficha oficial "D&D 4E": atributos, defesas, perícias, armas, poderes e habilidades. Funciona com o script de API (plano Pro) ou com uma **extensão para o Chrome (e navegadores baseados nele) e para o Firefox** que acompanha o pacote (sem Pro).
 - Criaturas também vão para o Roll20 com os poderes já nos espaços de poder.
 
 ### 7. Importar e exportar
