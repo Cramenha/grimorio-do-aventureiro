@@ -882,6 +882,25 @@ async function escolherVariante(cat, id, nome, extra = {}) {
   });
 }
 
+// Substitui o prompt(), que o Electron não suporta (devolve null sem mostrar nada). Resolve com o texto ou null.
+function pedirTexto(titulo, padrao = '') {
+  return new Promise((resolve) => {
+    let valor = null, aberto = false, fecharAoAbrir = false;
+    $('#leitor').innerHTML = `<h3>${esc(titulo)}</h3><input class="form-control" id="pt-txt" aria-label="${esc(titulo)}" value="${esc(padrao)}">
+      <div class="text-end mt-2"><button class="btn-rpg-mini" id="pt-cancel">Cancelar</button> <button class="btn-rpg" id="pt-ok">OK</button></div>`;
+    const el = $('#modalLeitor'), inp = $('#pt-txt');
+    // o Bootstrap ignora hide() durante a animação de entrada: um OK rápido fecha assim que ela termina
+    const fechar = () => { if (aberto) modal('modalLeitor').hide(); else fecharAoAbrir = true; };
+    el.addEventListener('shown.bs.modal', () => { aberto = true; if (fecharAoAbrir) return fechar(); inp.focus(); inp.select(); }, { once: true });
+    el.addEventListener('hidden.bs.modal', () => resolve(valor), { once: true });
+    const ok = () => { valor = inp.value.trim() || null; fechar(); };
+    $('#pt-ok').onclick = ok;
+    $('#pt-cancel').onclick = fechar;
+    inp.onkeydown = (e) => { if (e.key === 'Enter') ok(); };
+    modal('modalLeitor').show();
+  });
+}
+
 async function abaInventario() {
   const c = $('#conteudo-aba');
   c.innerHTML = `<div class="folha"><div class="d-flex gap-2 flex-wrap align-items-center mb-2"><h2 class="flex-grow-1 mb-0">Inventário</h2>
@@ -910,7 +929,7 @@ async function abaInventario() {
     P.itens.push({ id: uid(), cat: 'item', nome: m.Name, qtd: 1, equipado: false, custo: v.custo, variante: { mais: v.mais, nivel: v.nivel }, ref: { cat: 'item', id: m.ID } });
     log('item', `Comprou: ${m.Name}${v.mais ? ' +' + v.mais : ''}`); agendarSalvar(); abaInventario();
   } });
-  $('#add-livre').onclick = () => { const n = prompt('Nome do item:'); if (n) { P.itens.push({ id: uid(), cat: 'livre', nome: n, qtd: 1, equipado: false }); agendarSalvar(); abaInventario(); } };
+  $('#add-livre').onclick = async () => { const n = await pedirTexto('Nome do item:'); if (n) { P.itens.push({ id: uid(), cat: 'livre', nome: n, qtd: 1, equipado: false }); agendarSalvar(); abaInventario(); } };
 
   const desenhar = () => {
     $('#lista-itens').innerHTML = P.itens.length ? P.itens.map((it) => {
@@ -975,8 +994,8 @@ function abaNotas() {
       <button class="btn-rpg-mini" data-abrir="${n.id}">${n.janela?.aberta ? 'Trazer' : 'Abrir'}</button><button class="btn-rpg-mini" data-excl="${n.id}">🗑</button></div>
       <div class="rotulo">editado ${dataBR(n.editado)} · ${(n.texto || '').length} caract.</div>
       <div style="max-height:4.6rem;overflow:hidden;white-space:pre-wrap;font-size:.95rem">${esc((n.texto || '').slice(0, 220))}</div></div></div>`).join('')}</div></div>`;
-  $('#nova-nota').onclick = () => {
-    const n = prompt('Nome da janela de anotações:', 'Nova anotação'); if (!n) return;
+  $('#nova-nota').onclick = async () => {
+    const n = await pedirTexto('Nome da janela de anotações:', 'Nova anotação'); if (!n) return;
     const nota = novaNota(n); P.notas.push(nota); log('nota', `Janela criada: ${n}`); agendarSalvar(); abrirJanelaNota(nota.id); abaNotas();
   };
   $$('[data-abrir]').forEach((b) => b.onclick = () => abrirJanelaNota(b.dataset.abrir));

@@ -1,6 +1,6 @@
 {
   "name": "fichas-rpg",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Grimório do Aventureiro: fichas e anotações de D&D 4e com compêndio local",
   "main": "electron/main.mjs",
   "type": "module",

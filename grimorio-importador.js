@@ -67,12 +67,15 @@ on('ready', function () {
     var contagem = { atributos: 0, poderes: 0, habilidades: 0, linhas: 0 };
 
     // ao atualizar, apaga o que este importador cria em listas (linhas repetidas e habilidades do Grimório)
+    // e os espaços de poder acima do novo número de poderes, que sobravam da importação anterior
     if (!criada) {
+      var nPoderes = Math.min(100, (dados.poderes || []).length);
       findObjs({ _type: 'attribute', _characterid: cid }).forEach(function (a) {
-        if (/^repeating_(feats|race-feats|class-feats|inventory)_/.test(a.get('name'))) a.remove();
+        var nm = a.get('name'), slot = /^power-(\d+)-/.exec(nm);
+        if (/^repeating_(feats|race-feats|class-feats|inventory)_/.test(nm) || (slot && +slot[1] > nPoderes)) a.remove();
       });
       findObjs({ _type: 'ability', _characterid: cid }).forEach(function (a) {
-        if (/^(Talento|Item|Poder)-/.test(a.get('name'))) a.remove();
+        if (/^(Talento|Item|Poder|Augment|Rasgo)-|^Efeitos-Adicionais$/.test(a.get('name'))) a.remove();
       });
     }
 
