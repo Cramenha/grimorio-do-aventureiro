@@ -57,8 +57,13 @@
       await espera(600);
     } else {
       log('Atualizando a personagem "' + nome + '"...');
-      char.attribs.models.slice().forEach(function (a) { if (/^repeating_(feats|race-feats|class-feats|inventory)_/.test(a.get('name'))) a.destroy(); });
-      char.abilities.models.slice().forEach(function (a) { if (/^(Talento|Item|Poder)-/.test(a.get('name'))) a.destroy(); });
+      // apaga as listas e habilidades do Grimório e os espaços de poder acima do novo número de poderes
+      var nPoderes = Math.min(100, (dados.poderes || []).length);
+      char.attribs.models.slice().forEach(function (a) {
+        var nm = a.get('name'), slot = /^power-(\d+)-/.exec(nm);
+        if (/^repeating_(feats|race-feats|class-feats|inventory)_/.test(nm) || (slot && +slot[1] > nPoderes)) a.destroy();
+      });
+      char.abilities.models.slice().forEach(function (a) { if (/^(Talento|Item|Poder|Augment|Rasgo)-|^Efeitos-Adicionais$/.test(a.get('name'))) a.destroy(); });
       await espera(300);
     }
 
