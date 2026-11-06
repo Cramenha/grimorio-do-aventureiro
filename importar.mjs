@@ -43,6 +43,29 @@ function ref(cat, nome, ctx) {
   return e ? { cat, id: e.ID, nome: e.Name } : { cat, id: null, nome: ent(nome) };
 }
 
+// Bônus situacionais que o CB guarda no <StatBlock> (statadd com conditional="…") e imprime na ficha em PDF:
+// "Special Movement" no Deslocamento, "Conditional Bonuses" em cada defesa e na Iniciativa. O regras.json não os
+// tem (extrair-regras pula os situacionais), então a única fonte é o próprio .dnd4e. Texto em inglês, como o CB.
+const QUADRO_COND = { ac: 'ac', 'armor class': 'ac', 'fortitude defense': 'fort', 'reflex defense': 'ref', 'will defense': 'vont',
+  initiative: 'ini', speed: 'vel', 'saving throws': 'resist' };
+export function condicionaisDoCB(x) {
+  const lista = [];
+  for (const m of x.matchAll(/<Stat\b([^>]*)>([\s\S]*?)<\/Stat>/g)) {
+    const nome = ent([(/name="([^"]+)"/.exec(m[1]) || [])[1], ...[...m[2].matchAll(/<alias name="([^"]+)"/g)].map((a) => a[1])].find(Boolean) || '');
+    for (const sa of m[2].matchAll(/<statadd\b([^>]*?)\/?>/g)) {
+      const cond = /conditional="([^"]*)"/.exec(sa[1])?.[1];
+      if (!cond) continue;
+      const str = /String="([^"]*)"/.exec(sa[1])?.[1], v = +(/value="(-?\d+)"/.exec(sa[1])?.[1] || 0);
+      const valor = str ? ent(str) : (v >= 0 ? '+' : '') + v;
+      // "axe group:damage" -> "damage (axe group)"; "beast form,melee:damage" -> "damage (beast form, melee)"
+      const [qual, alvo] = nome.includes(':') ? nome.split(':') : [null, nome];
+      const rotulo = qual ? `${alvo} (${qual.replace(/,/g, ', ')})` : alvo;
+      lista.push({ quadro: QUADRO_COND[nome.toLowerCase()] || 'ataque', texto: `${valor} ${rotulo} ${ent(cond)}` });
+    }
+  }
+  return lista.filter((c, i) => lista.findIndex((d) => d.texto === c.texto) === i);
+}
+
 // ------------------------------------------------------------ .dnd4e
 export function lerDnd4e(texto) {
   const x = texto.replace(/^﻿/, '');
@@ -85,7 +108,7 @@ export function lerDnd4e(texto) {
   const p = novoPersonagem({
     nome: tag(det, 'name') || 'Importado', jogador: tag(det, 'Player'), nivel, xp: parseInt(tag(det, 'Experience'), 10) || 0,
     altura: tag(det, 'Height'), peso: tag(det, 'Weight'), genero: tag(det, 'Gender') || um('Gender') || '', idade: tag(det, 'Age'),
-    tendencia: tag(det, 'Alignment') || um('Alignment') || '', tamanho: um('Size') || '',
+    tendencia: tag(det, 'Alignment') || um('Alignment') || '', tamanho: um('Size') || '', companhia: tag(det, 'Company'),
     dinheiro: [tag(det, 'CarriedMoney') && 'Consigo: ' + tag(det, 'CarriedMoney'), tag(det, 'StoredMoney') && 'Guardado: ' + tag(det, 'StoredMoney')].filter(Boolean).join(' | '),
     tracos: tag(det, 'Traits'), aparencia: tag(det, 'Appearance'), companheiros: tag(det, 'Companions'),
     atributos: { for: s('Strength'), con: s('Constitution'), des: s('Dexterity'), int: s('Intelligence'), sab: s('Wisdom'), car: s('Charisma') },
@@ -162,6 +185,7 @@ export function lerDnd4e(texto) {
     }
   }
   if (atr) p.atr = atr;
+  p.condicionaisCB = condicionaisDoCB(x);
   p.valoresCB = { ca: s('AC'), fort: s('Fortitude Defense'), ref: s('Reflex Defense'), vont: s('Will Defense'), pv: s('Hit Points'), surtos: s('Healing Surges'), iniciativa: s('Initiative'), velocidade: s('Speed') };
   // bônus de perícia que o CB conta como "Misc" por escolhas que o motor não vê (ex.: antecedente): vira ajuste manual
   p.extras = ['Class Feature', 'Racial Trait', 'Grants', 'Build', 'Trait Package', 'Proficiency', 'Internal', 'Background Choice', 'Hybrid Class', 'Familiar']
