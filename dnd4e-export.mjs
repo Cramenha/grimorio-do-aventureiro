@@ -213,7 +213,7 @@ export function exportarDnd4e(P) {
          <Gender> ${x(limpa(P.genero))} </Gender>
          <Age> ${x(limpa(P.idade))} </Age>
          <Alignment> ${x(limpa(P.tendencia))} </Alignment>
-         <Company>  </Company>
+         <Company> ${x(limpa(P.companhia))} </Company>
          <Portrait>  </Portrait>
          <Experience> ${+P.xp || 0} </Experience>
          <CarriedMoney> ${x(limpa(comigo))} </CarriedMoney>

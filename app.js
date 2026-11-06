@@ -147,12 +147,31 @@ function aplicarCalculo() {
   set('sangrando', Math.floor(C.pv / 2)); set('meio', Math.floor(C.nivel / 2)); set('penal', C.penalidadeArmadura);
   PERICIAS.forEach(([n]) => set('per:' + n, sinal(C.pericias[n])));
   set('passiva:Perception', 10 + C.pericias.Perception); set('passiva:Insight', 10 + C.pericias.Insight);
+  // colunas da ficha do CB: o CB deixa em branco o que é zero, menos 10 + ½ nível
+  const meia = Math.floor(C.nivel / 2), vz = (n) => (n ? sinal(n) : '');
+  ATRS.forEach(([k]) => set('teste:' + k, sinal(C.modificadores[k] + meia)));
+  DEFESAS.forEach(([k, , par]) => { const q = quebraDefesa(C, k, par); for (const [col, v] of Object.entries(q)) set(`d:${k}:${col}`, col === 'base' ? v : vz(v)); });
+  set('i:des', sinal(C.modificadores.des)); set('i:outros', vz(C.iniciativa - C.modificadores.des - meia));
+  const vq = quebraVelocidade(C); set('v:base', vq.base); set('v:armad', vz(vq.armad)); set('v:item', vz(vq.item)); set('v:outros', vz(vq.outros));
+  PERICIAS.forEach(([n, , a]) => {
+    const pe = P.pericias[n] || {}, atr = C.modificadores[a] + meia, pen = PENALIZA.has(n) ? C.penalidadeArmadura : 0;
+    set(`p:${n}:atr`, sinal(atr)); set(`p:${n}:pen`, PENALIZA.has(n) ? (pen ? pen : '0') : '—');
+    set(`p:${n}:outros`, vz(C.pericias[n] - atr - (pe.treinada ? 5 : 0) - pen - (+pe.extra || 0)), dica(C.origem.pericias?.[n]));
+  });
   const b = $('#barra-pv'); if (b) b.style.width = Math.max(0, Math.min(100, ((+P.pvAtual || 0) / (C.pv || 1)) * 100)) + '%';
   const av = $('#painel-avisos');
   if (av) av.innerHTML = C.avisos.length ? C.avisos.map((a) => `<div class="aviso">⚠ ${esc(a)}</div>`).join('') : '';
+  // área de ataque e de dano do CB, uma por arma equipada (implemento: o atributo e o ½ nível vêm do poder)
   const at = $('#painel-ataques');
-  if (at) at.innerHTML = C.ataques.length ? `<table class="tabela-per"><tr><th>Arma equipada</th><th>Ataque</th><th>Dano</th></tr>${C.ataques.map((x) =>
-    `<tr><td><b>${esc(x.nome)}</b> <small>${esc(x.grupo)}${x.mais ? ' · +' + x.mais : ''}</small></td><td>${sinal(x.ataque)} <small>(${x.atributo.toUpperCase()}${x.alternativo ? ' / ' + x.alternativo.atributo.toUpperCase() + ' ' + sinal(x.alternativo.ataque) : ''})</small></td><td>${esc(x.dano)}${x.danoBonus ? sinal(x.danoBonus) : ''}</td></tr>`).join('')}</table>` : '<p class="text-muted mb-0">Equipe uma arma no inventário para ver ataque e dano.</p>';
+  const caixa = (rot, v) => `<div class="cel"><span class="cel-r">${rot}</span><span class="cel-v">${v}</span></div>`;
+  const grande = (rot, v) => `<div class="placar"><span class="placar-r">${rot}</span><span class="placar-v">${v}</span></div>`;
+  if (at) at.innerHTML = C.ataques.length ? C.ataques.map((x) => {
+    const atr = x.implemento ? 0 : C.modificadores[x.atributo];
+    return `<div class="atq"><div class="atq-nome"><b>${esc(x.nome)}</b> <small>${esc(x.grupo)} · ${x.implemento ? 'implemento' : x.atributo.toUpperCase()}${x.alternativo ? ` (com ${x.alternativo.atributo.toUpperCase()}: ${sinal(x.alternativo.ataque)})` : ''}</small></div>
+      <div class="linha-placar">${grande(x.implemento ? 'Ataque' : 'Ataque vs CA', sinal(x.ataque))}<div class="linha-cel">${x.implemento ? '' : caixa('½ nív.', meia) + caixa('Atrib.', sinal(atr))}${caixa('Prof.', vz(x.prof))}${caixa('Aprim.', vz(x.mais))}${caixa('Outros', vz(x.extraAtq))}</div></div>
+      <div class="linha-placar">${grande('Dano', '<span class="dado">' + esc(x.dano) + (x.danoBonus ? sinal(x.danoBonus) : '') + '</span>')}<div class="linha-cel">${x.implemento ? '' : caixa('Atrib.', sinal(atr))}${caixa('Aprim.', vz(x.mais))}${caixa('Outros', vz(x.extraDano))}</div></div></div>`;
+  }).join('') + '<p class="rotulo mb-0">Talentos e poderes que só valem para certas armas entram no cálculo de cada poder, no grimório.</p>'
+    : '<p class="text-muted mb-0">Equipe uma arma no inventário para ver ataque e dano.</p>';
   const gasto = $('#ouro-gasto'); if (gasto) gasto.textContent = po(C.gastos);
 }
 
@@ -686,11 +705,11 @@ function nomeClasse(Q) {
   const h = (Q.extras || []).filter((e) => /^ID_FMP_HYBRID_CLASS_/.test(e.id)).map((e) => e.nome.replace(/^Hybrid\s+/i, ''));
   return h.length ? 'Híbrido: ' + h.join(' + ') : n;
 }
-function campoEscolha([chave, cat, rotulo]) {
+function campoEscolha([chave, cat, rotulo], col = 'col-sm-6 col-lg-4') {
   const v = P[chave];
-  return `<div class="col-sm-6 col-lg-4"><div class="rotulo">${rotulo}</div><div class="escolha">
+  return `<div class="${col}"><div class="rotulo">${rotulo}</div><div class="escolha">
     <span class="valor ${v ? '' : 'vazio'}" data-ver="${chave}">${esc((chave === 'classe' ? nomeClasse(P) : v?.nome) || 'escolher…')}</span>
-    <button class="btn-rpg-mini" data-esc="${chave}">${v ? 'Trocar' : 'Escolher'}</button>${v ? `<button class="btn-rpg-mini" data-limpar="${chave}">✕</button>` : ''}</div></div>`;
+    <button class="btn-rpg-mini" data-esc="${chave}">${v ? 'Trocar' : 'Escolher'}</button>${v ? `<button class="btn-rpg-mini" data-limpar="${chave}" aria-label="Limpar ${rotulo}">✕</button>` : ''}</div></div>`;
 }
 function ligarEscolhas() {
   $$('[data-esc]').forEach((b) => b.onclick = () => {
@@ -715,79 +734,176 @@ async function sugerirBonusRaca(id) {
   } catch { /* sem sugestão */ }
 }
 
+// ------------------------------------------------------------ aba Ficha
+// Segue a página 1 da ficha em PDF do Character Builder: as mesmas seções, na mesma coluna e na mesma ordem, para
+// quem joga com o PDF achar cada campo onde já procura. A caixa de atributo (modificador grande, valor no oval) e os
+// quadros com título em caixa-alta vêm da ficha do D&D Beyond, redesenhados nos tokens do DESIGN.md.
+const PARES_ATR = [['for', 'con'], ['des', 'int'], ['sab', 'car']]; // cada par defende uma defesa, como no CB
+const DEFESAS = [['ac', 'CA', ['des', 'int']], ['fort', 'Fort', ['for', 'con']], ['ref', 'Ref', ['des', 'int']], ['vont', 'Vont', ['sab', 'car']]];
+const PENALIZA = new Set(['Acrobatics', 'Athletics', 'Endurance', 'Stealth', 'Thievery']); // mesma lista do calculo.mjs
+const bloco = (titulo, corpo) => `<section class="folha bloco"><h3 class="bloco-tit">${titulo}</h3><div class="bloco-corpo">${corpo}</div></section>`;
+const cel = (rot, calc) => `<div class="cel"><span class="cel-r">${rot}</span><span class="cel-v" data-calc="${calc}"></span></div>`;
+const placar = (rot, calc) => `<div class="placar"><span class="placar-r">${rot}</span><span class="placar-v" data-calc="${calc}"></span></div>`;
+// bônus situacionais lidos do .dnd4e (ver condicionaisDoCB em importar.mjs), no quadro em que o PDF do CB os imprime
+const condCB = (quadro) => { const l = (P.condicionaisCB || []).filter((c) => c.quadro === quadro); return l.length ? `<ul class="cond-cb">${l.map((c) => `<li>${esc(c.texto)}</li>`).join('')}</ul>` : ''; };
+const campoLinha = (rot, bind, extra = '') => `<label class="campo-linha"><span class="rotulo">${rot}</span><input class="form-control" data-bind="${bind}" ${extra}></label>`;
+
+// Total de uma defesa nas colunas do CB. C.origem não traz as "Regras base" (10 + ½ nível, atributo e bônus de
+// classe), então atributo e classe saem pela diferença. Linha com tipo "Ability" não soma: diz qual atributo a
+// defesa usa (Wildblood põe Sabedoria na CA). Escudo cai em "Outros", como no CB.
+function quebraDefesa(C, k, par) {
+  const base = 10 + Math.floor(C.nivel / 2);
+  let armad = 0, aprim = 0, talento = 0, outros = 0, atrib = null;
+  for (const l of C.origem[k] || []) {
+    if (l.aplicado === false) continue;
+    const t = (l.tipo || '').toLowerCase();
+    if (t === 'ability') atrib = Math.max(atrib ?? -99, l.valor);
+    else if (t === 'armor' && k === 'ac') armad += l.valor;
+    else if (t === 'enhancement') aprim += l.valor;
+    else if (t === 'feat') talento += l.valor;
+    else outros += l.valor;
+  }
+  const resto = C[k] - base - armad - aprim - talento - outros;
+  if (atrib === null) {
+    atrib = Math.max(...par.map((a) => C.modificadores[a]));
+    if (k === 'ac' && resto < atrib) atrib = 0; // armadura pesada: CA sem atributo
+  }
+  let classe = resto - atrib;
+  if (classe < 0) { outros += classe; classe = 0; } // a soma das colunas continua igual ao total
+  return { base, atr: armad + atrib, classe, talento, aprim, outros };
+}
+function quebraVelocidade(C) {
+  let armad = 0, item = 0, outros = 0;
+  for (const l of C.origem.velocidade || []) {
+    if (l.aplicado === false || /^Raça/.test(l.fonte)) continue;
+    if (/^(Armadura|Escudo)/.test(l.fonte)) armad += l.valor;
+    else if (/^(item|enhancement)$/i.test(l.tipo || '')) item += l.valor;
+    else outros += l.valor;
+  }
+  return { base: C.velocidade - armad - item - outros, armad, item, outros };
+}
+// características vindas do .dnd4e (P.extras); as "INTERNAL" são contabilidade do CB, não aparecem na ficha dele
+const caracteristicas = (re) => (P.extras || []).filter((e) => re.test(e.id || '') && !/^ID_INTERNAL/i.test(e.id || ''));
+function listaCaracteristicas(re, refs) {
+  const ex = caracteristicas(re);
+  if (ex.length) return ex.map((e) => `<div class="lista-item">${esc(e.nome)}</div>`).join('');
+  const comp = refs.filter((k) => P[k]?.id);
+  return comp.length ? `<p class="text-muted small mb-1">Fichas importadas do Character Builder listam aqui cada característica. Consulte no compêndio:</p>
+    ${comp.map((k) => `<button class="btn-rpg-mini me-1 mb-1" data-ver="${k}">${esc(k === 'classe' ? nomeClasse(P) : P[k].nome)}</button>`).join('')}`
+    : '<p class="text-muted small mb-0">Escolha raça e classe no quadro Personagem.</p>';
+}
+
 function abaFicha() {
   const c = $('#conteudo-aba');
   const niveis = NIVEIS_AUMENTO.filter((n) => n <= P.nivel);
-  c.innerHTML = `
-  <div class="row g-3">
-    <div class="col-12"><div class="folha"><h2>Quem é</h2><div class="row g-2">
-      ${ESCOLHAS.map(campoEscolha).join('')}
-      <div class="col-6 col-md-2"><div class="rotulo">Nível</div><input class="form-control" type="number" min="1" max="30" data-bind="nivel"></div>
-      <div class="col-6 col-md-2"><div class="rotulo">XP</div><input class="form-control" type="number" data-bind="xp"></div>
-      <div class="col-6 col-md-3"><div class="rotulo">Jogador</div><input class="form-control" data-bind="jogador"></div>
-      <div class="col-6 col-md-3"><div class="rotulo">Tendência</div><input class="form-control" data-bind="tendencia"></div>
-      <div class="col-4 col-md-2"><div class="rotulo">Tamanho</div><input class="form-control" data-bind="tamanho"></div>
-      <div class="col-4 col-md-2"><div class="rotulo">Gênero</div><input class="form-control" data-bind="genero"></div>
-      <div class="col-4 col-md-2"><div class="rotulo">Idade</div><input class="form-control" data-bind="idade"></div>
-      <div class="col-6 col-md-2"><div class="rotulo">Altura</div><input class="form-control" data-bind="altura"></div>
-      <div class="col-6 col-md-2"><div class="rotulo">Peso</div><input class="form-control" data-bind="peso"></div>
-      <div class="col-12 col-md-6"><div class="rotulo">Idiomas</div><input class="form-control" data-bind="idiomas"></div>
-    </div></div></div>
+  const [raca, classe, paragon, destino, tema, antecedente, divindade] = ESCOLHAS;
+  const caixaAtr = (k) => { const [, n] = ATRS.find((a) => a[0] === k); return `<div class="atr-caixa" title="${n}">
+    <span class="atr-nome">${n}</span><span class="atr-mod" data-calc="mod:${k}"></span><span class="atr-valor" data-calc="atr:${k}"></span>
+    <span class="atr-teste">teste <b data-calc="teste:${k}"></b></span></div>`; };
 
-    <div class="col-lg-5"><div class="folha h-100"><h2>Atributos</h2>
-      <table class="tabela-per tabela-atr"><thead><tr><th></th><th>Base</th><th>Raça</th><th>Níveis</th><th>Final</th><th>Mod.</th></tr></thead><tbody>
+  const personagem = bloco('Personagem', `<div class="row g-2">
+      <div class="col-4 col-md-2 col-xl-1"><div class="rotulo">Nível</div><input class="form-control" type="number" min="1" max="30" data-bind="nivel"></div>
+      ${campoEscolha(classe, 'col-8 col-md-4 col-xl-3')}${campoEscolha(paragon, 'col-md-6 col-xl-3')}${campoEscolha(destino, 'col-md-6 col-xl-3')}
+      <div class="col-md-6 col-xl-2"><div class="rotulo">XP total</div><input class="form-control" type="number" data-bind="xp"></div>
+      ${campoEscolha(raca, 'col-md-6 col-xl-3')}
+      <div class="col-6 col-md-3 col-xl-1"><div class="rotulo">Tamanho</div><input class="form-control" data-bind="tamanho"></div>
+      <div class="col-6 col-md-3 col-xl-1"><div class="rotulo">Idade</div><input class="form-control" data-bind="idade"></div>
+      <div class="col-6 col-md-3 col-xl-1"><div class="rotulo">Gênero</div><input class="form-control" data-bind="genero"></div>
+      <div class="col-6 col-md-3 col-xl-1"><div class="rotulo">Altura</div><input class="form-control" data-bind="altura"></div>
+      <div class="col-6 col-md-3 col-xl-1"><div class="rotulo">Peso</div><input class="form-control" data-bind="peso"></div>
+      <div class="col-6 col-md-3 col-xl-2"><div class="rotulo">Tendência</div><input class="form-control" data-bind="tendencia"></div>
+      ${campoEscolha(divindade, 'col-md-6 col-xl-2')}
+      ${campoEscolha(tema, 'col-md-6 col-xl-3')}${campoEscolha(antecedente, 'col-md-6 col-xl-3')}
+      <div class="col-md-6 col-xl-3"><div class="rotulo">Companhia de aventureiros</div><input class="form-control" data-bind="companhia"></div>
+      <div class="col-md-6 col-xl-3"><div class="rotulo">Jogador</div><input class="form-control" data-bind="jogador"></div>
+    </div>`);
+
+  const iniciativa = bloco('Iniciativa', `<div class="linha-placar">${placar('Iniciativa', 'ini')}<div class="linha-cel">${cel('Des', 'i:des')}${cel('½ nív.', 'meio')}${cel('Outros', 'i:outros')}</div></div>
+    ${condCB('ini')}${campoLinha('Modificadores condicionais', 'iniciativaCond')}`);
+
+  const atributos = bloco('Atributos', `<div class="atr-grade">${PARES_ATR.map((par) => `<div class="atr-par">${par.map(caixaAtr).join('')}</div>`).join('')}</div>
+    <p class="rotulo mb-1">Teste = modificador + ½ nível. Pares lado a lado defendem a mesma defesa.</p>
+    <div class="d-flex gap-2 flex-wrap"><button class="btn-rpg-mini" id="atr-editar" aria-expanded="${!P.raca}" aria-controls="atr-box">Editar valores</button>
+      <button class="btn-rpg-mini" id="aumentos" ${niveis.length ? '' : 'disabled'}>Aumentos por nível (${niveis.length ? niveis.join(', ') : 'a partir do 4'})</button></div>
+    <div id="atr-box" class="mt-2 ${P.raca ? 'invisivel' : ''}">
+      <table class="tabela-per tabela-atr"><thead><tr><th></th><th>Base</th><th>Raça</th><th>Níveis</th><th>Final</th></tr></thead><tbody>
       ${ATRS.map(([k, n, s]) => `<tr><td class="nome-per" title="${n}"><b>${s}</b></td>
-        <td><input class="form-control" type="number" data-bind="atr.base.${k}"></td>
-        <td><input class="form-control" type="number" data-bind="atr.racial.${k}"></td>
-        <td class="text-center" data-calc="niv:${k}"></td>
-        <td class="total" data-calc="atr:${k}"></td><td class="total mod" data-calc="mod:${k}"></td></tr>`).join('')}</tbody></table>
-      <div class="d-flex gap-2 mt-2 flex-wrap"><button class="btn-rpg-mini" id="aumentos" ${niveis.length ? '' : 'disabled'}>Aumentos por nível (${niveis.length ? niveis.join(', ') : 'a partir do 4'})</button>
-        <small class="text-muted align-self-center">Os +1 dos níveis 11 e 21 entram sozinhos.</small></div>
-      <div class="rotulo mt-2">Metade do nível: <b data-calc="meio"></b></div></div></div>
+        <td><input class="form-control" type="number" data-bind="atr.base.${k}" aria-label="${n} base"></td>
+        <td><input class="form-control" type="number" data-bind="atr.racial.${k}" aria-label="${n} racial"></td>
+        <td class="text-center" data-calc="niv:${k}"></td><td class="total" data-calc="atr:${k}"></td></tr>`).join('')}</tbody></table>
+      <small class="text-muted">Os +1 dos níveis 11 e 21 entram sozinhos.</small></div>`);
 
-    <div class="col-lg-7"><div class="folha h-100"><h2>Defesas e vida <small class="text-muted" style="font-size:.7rem">calculadas — passe o mouse para ver de onde vem cada bônus</small></h2>
-      <div class="row g-1 text-center mb-2">${[['ac', 'CA'], ['fort', 'FORT'], ['ref', 'REF'], ['vont', 'VONT']].map(([k, n]) => `<div class="col-3 def"><div class="escudo"><div class="rotulo">${n}</div><div class="num-escudo" data-calc="${k}"></div></div></div>`).join('')}</div>
-      <div class="row g-2">
-        <div class="col-3"><div class="rotulo">PV máx.</div><div class="num-calc" data-calc="pv"></div></div>
-        <div class="col-3"><div class="rotulo">PV atuais</div><input class="form-control" type="number" data-bind="pvAtual"></div>
-        <div class="col-3"><div class="rotulo">Pulsos/dia</div><div class="num-calc" data-calc="surtos"></div></div>
-        <div class="col-3"><div class="rotulo">Pulsos atuais</div><input class="form-control" type="number" data-bind="surtosAtuais"></div>
-        <div class="col-3"><div class="rotulo">Velocidade</div><div class="num-calc" data-calc="vel"></div></div>
-        <div class="col-3"><div class="rotulo">Iniciativa</div><div class="num-calc" data-calc="ini"></div></div>
-        <div class="col-3"><div class="rotulo">Valor do pulso</div><div class="num-calc" data-calc="valorsurto"></div></div>
-        <div class="col-3"><div class="rotulo">Sangrando em</div><div class="num-calc" data-calc="sangrando"></div></div>
-        <div class="col-3"><div class="rotulo">Percepção passiva</div><div class="num-calc" data-calc="passiva:Perception"></div></div>
-        <div class="col-3"><div class="rotulo">Intuição passiva</div><div class="num-calc" data-calc="passiva:Insight"></div></div>
-        <div class="col-12"><div class="barra-vida"><i id="barra-pv"></i></div></div>
-        <div class="col-12 d-flex gap-2 flex-wrap"><button class="btn-rpg-mini" id="usar-surto">Usar pulso de cura</button><button class="btn-rpg-mini" id="desc-longo">Descanso longo</button>
-          <button class="btn-rpg-mini" id="ajustes-btn">Ajustes manuais ${Object.keys(P.ajustes).length ? '(' + Object.keys(P.ajustes).length + ')' : ''}</button></div>
-        <div class="col-12 invisivel" id="ajustes-box"><div class="rotulo">Some ou tire pontos do cálculo (escolhas especiais que o app não lê; fichas importadas guardam aqui a diferença para bater com o original)</div>
-          <div class="row g-1">${[['ca', 'CA'], ['fort', 'Fort'], ['ref', 'Ref'], ['vont', 'Vont'], ['pv', 'PV'], ['surtos', 'Pulsos'], ['ini', 'Inic.'], ['vel', 'Vel.']].map(([k, n]) => `<div class="col-3"><div class="rotulo">${n}</div><input class="form-control" type="number" data-bind="ajustes.${k}"></div>`).join('')}</div></div>
-      </div>
-      <h3 class="mt-3">Ataques das armas equipadas</h3><div id="painel-ataques"></div></div></div>
+  const vida = bloco('Pontos de vida', `<div class="linha-placar">${placar('PV máx.', 'pv')}<div class="linha-cel">${cel('Sangrando', 'sangrando')}${cel('Valor do pulso', 'valorsurto')}${cel('Pulsos/dia', 'surtos')}</div></div>
+    <div class="row g-2 mt-1">
+      <div class="col-6"><div class="rotulo">PV atuais</div><input class="form-control campo-grande" type="number" data-bind="pvAtual"></div>
+      <div class="col-6"><div class="rotulo">Pulsos restantes</div><input class="form-control campo-grande" type="number" data-bind="surtosAtuais"></div>
+      <div class="col-12"><div class="barra-vida"><i id="barra-pv"></i></div></div>
+      <div class="col-6"><div class="rotulo">PV temporários</div><input class="form-control" type="number" min="0" data-bind="pvTemp"></div>
+      <div class="col-6"><div class="rotulo">Segundo fôlego</div><label class="marca-uso"><input class="form-check-input" type="checkbox" data-bind="segundoFolego"> usado neste encontro</label></div>
+      <div class="col-12"><div class="rotulo">Falhas em testes de morte</div><div class="d-flex gap-2">${[0, 1, 2].map((i) => `<input class="form-check-input" type="checkbox" data-bind="falhasMorte.${i}" aria-label="Falha ${i + 1}">`).join('')}</div></div>
+    </div>
+    ${condCB('resist')}${campoLinha('Modificadores de teste de resistência', 'modResistencia')}${campoLinha('Resistências', 'resistencias')}${campoLinha('Condições e efeitos atuais', 'condicoes')}
+    <div class="d-flex gap-2 flex-wrap mt-2"><button class="btn-rpg-mini" id="usar-surto">Usar pulso de cura</button><button class="btn-rpg-mini" id="desc-longo">Descanso longo</button>
+      <button class="btn-rpg-mini" id="ajustes-btn" aria-expanded="false" aria-controls="ajustes-box">Ajustes manuais ${Object.keys(P.ajustes || {}).length ? '(' + Object.keys(P.ajustes).length + ')' : ''}</button></div>
+    <div class="invisivel mt-2" id="ajustes-box"><div class="rotulo">Some ou tire pontos do cálculo (escolhas especiais que o app não lê; fichas importadas guardam aqui a diferença para bater com o original)</div>
+      <div class="row g-1">${[['ca', 'CA'], ['fort', 'Fort'], ['ref', 'Ref'], ['vont', 'Vont'], ['pv', 'PV'], ['surtos', 'Pulsos'], ['ini', 'Inic.'], ['vel', 'Vel.']].map(([k, n]) => `<div class="col-3"><div class="rotulo">${n}</div><input class="form-control" type="number" data-bind="ajustes.${k}"></div>`).join('')}</div></div>`);
 
-    <div class="col-lg-6"><div class="folha h-100"><h2>Perícias <small class="text-muted" style="font-size:.7rem">penalidade de armadura: <span data-calc="penal"></span></small></h2><table class="tabela-per">${PERICIAS.map(([n, pt, a]) => { const pe = P.pericias[n] || (P.pericias[n] = { treinada: false, extra: 0 }); return `<tr class="${pe.treinada ? 'trein' : ''}">
-      <td class="total" data-calc="per:${n}"></td><td class="nome-per">${pt} <small>(${a.toUpperCase()})</small></td>
-      <td><input class="form-check-input" type="checkbox" data-bind="pericias.${n}.treinada" title="Treinada (+5)"></td>
-      <td><input class="form-control" type="number" data-bind="pericias.${n}.extra" title="Bônus extra manual"></td></tr>`; }).join('')}</table>
-      <div class="rotulo mt-1">☑ treinada (+5) · último campo = bônus extra manual (itens, raça e armadura já entram sozinhos)</div></div></div>
+  const pericias = bloco(`Perícias`, `<table class="tabela-per tabela-pericias"><thead><tr><th>Bônus</th><th>Perícia</th><th title="Modificador de atributo + ½ nível">Atr + ½</th><th title="Treinada: +5">Trein.</th><th title="Penalidade de armadura">Armad.</th><th title="Raça, itens e talentos (passe o mouse no número)">Outros</th><th title="Bônus manual seu">Extra</th></tr></thead><tbody>
+    ${PERICIAS.map(([n, pt, a]) => { const pe = P.pericias[n] || (P.pericias[n] = { treinada: false, extra: 0 }); return `<tr class="${pe.treinada ? 'trein' : ''}">
+      <td class="total" data-calc="per:${n}"></td><td class="nome-per">${pt} <small>${a.toUpperCase()}</small></td><td class="text-center" data-calc="p:${n}:atr"></td>
+      <td class="text-center"><input class="form-check-input" type="checkbox" data-bind="pericias.${n}.treinada" aria-label="${pt} treinada"></td>
+      <td class="text-center" data-calc="p:${n}:pen"></td><td class="text-center ajuda" data-calc="p:${n}:outros"></td>
+      <td><input class="form-control" type="number" data-bind="pericias.${n}.extra" aria-label="${pt}: bônus extra"></td></tr>`; }).join('')}</tbody></table>`);
 
-    <div class="col-lg-6"><div class="folha mb-3"><h2>Talentos</h2><div id="lista-talentos"></div>
-      <button class="btn-rpg-sec btn-sm mt-2" id="add-talento">＋ Adicionar talento</button></div>
-      <div class="folha"><h2>Personalidade</h2>
-      <div class="rotulo">Traços</div><textarea class="form-control mb-2" rows="3" data-bind="tracos"></textarea>
-      <div class="rotulo">Aparência</div><textarea class="form-control mb-2" rows="2" data-bind="aparencia"></textarea>
-      <div class="rotulo">Companheiros</div><textarea class="form-control" rows="2" data-bind="companheiros"></textarea></div></div>
-  </div>`;
+  const defesas = bloco('Defesas', `${DEFESAS.map(([k, n]) => `<div class="def-bloco">
+      <div class="linha-placar">${placar(n, k)}<div class="linha-cel">${cel('10 + ½ nív.', `d:${k}:base`)}${cel(k === 'ac' ? 'Armad. + Atrib.' : 'Atrib.', `d:${k}:atr`)}${cel('Classe', `d:${k}:classe`)}${cel('Talento', `d:${k}:talento`)}${cel('Aprim.', `d:${k}:aprim`)}${cel('Outros', `d:${k}:outros`)}</div></div>
+      ${condCB(k)}${campoLinha('Bônus condicionais', `defCond.${k}`)}</div>`).join('')}
+    <p class="rotulo mb-0">Passe o mouse no total para ver de onde vem cada bônus.</p>`);
+
+  const pontosAcao = bloco('Pontos de ação', `<div class="row g-2">
+      <div class="col-6"><div class="rotulo">Pontos de ação</div><input class="form-control campo-grande" type="number" min="0" placeholder="1" data-bind="pontosAcao"></div>
+      <div class="col-6"><div class="rotulo">Marcos</div><input class="form-control campo-grande" type="number" min="0" placeholder="0" data-bind="marcos"></div></div>
+    <p class="rotulo mt-1 mb-0">Descanso longo volta a 1. Cada marco dá +1.</p>
+    ${campoLinha('Efeitos adicionais ao gastar', 'paEfeitos')}`);
+
+  const deslocamento = bloco('Deslocamento', `<div class="linha-placar">${placar('Quadrados', 'vel')}<div class="linha-cel">${cel('Base', 'v:base')}${cel('Armad.', 'v:armad')}${cel('Item', 'v:item')}${cel('Outros', 'v:outros')}</div></div>
+    ${condCB('vel')}${campoLinha('Deslocamento especial', 'deslocEspecial')}`);
+
+  const sentidos = bloco('Sentidos', `<div class="linha-placar">${placar('Intuição passiva', 'passiva:Insight')}${placar('Percepção passiva', 'passiva:Perception')}</div>
+    ${campoLinha('Sentidos especiais', 'sentidosEspeciais', 'placeholder="Visão na penumbra, visão no escuro…"')}`);
+
+  const ataques = bloco('Ataques', `<div id="painel-ataques"></div>${(P.condicionaisCB || []).some((c) => c.quadro === 'ataque') ? `<div class="rotulo mt-2">Bônus condicionais</div>${condCB('ataque')}` : ''}`);
+
+  c.innerHTML = `<div class="ficha-cb">
+    ${personagem}
+    <div class="row g-3">
+      <div class="col-lg-6 col-xl-4 coluna-cb">${iniciativa}${atributos}${vida}${pericias}</div>
+      <div class="col-lg-6 col-xl-4 coluna-cb">${defesas}${pontosAcao}
+        ${bloco('Características raciais', listaCaracteristicas(/RACIAL_TRAIT/i, ['raca']))}
+        ${bloco('Características de classe, trilha e destino', listaCaracteristicas(/CLASS_FEATURE|THEME_FEATURE/i, ['classe', 'paragon', 'destino', 'tema']))}
+        ${bloco('Idiomas', `<input class="form-control" data-bind="idiomas" aria-label="Idiomas">`)}</div>
+      <div class="col-lg-12 col-xl-4 coluna-cb">${deslocamento}${sentidos}${ataques}
+        ${bloco('Talentos', `<div id="lista-talentos"></div><button class="btn-rpg-sec btn-sm mt-2" id="add-talento">＋ Adicionar talento</button>`)}</div>
+    </div>
+    <div class="row g-3 mt-0">
+      <div class="col-lg-4">${bloco('Traços de personalidade', `<textarea class="form-control" rows="5" data-bind="tracos" aria-label="Traços de personalidade"></textarea>`)}</div>
+      <div class="col-lg-4">${bloco('Maneirismos e aparência', `<textarea class="form-control" rows="5" data-bind="aparencia" aria-label="Maneirismos e aparência"></textarea>`)}</div>
+      <div class="col-lg-4">${bloco('Companheiros e aliados', `<textarea class="form-control" rows="5" data-bind="companheiros" aria-label="Companheiros e aliados"></textarea>`)}</div>
+    </div></div>`;
   ligarCampos(c); ligarEscolhas(); listaTalentos();
-  $('#ajustes-btn').onclick = () => $('#ajustes-box').classList.toggle('invisivel');
+  const alternar = (botao, caixa) => { $(botao).onclick = (e) => { const aberta = $(caixa).classList.toggle('invisivel') === false; e.currentTarget.setAttribute('aria-expanded', aberta); }; };
+  alternar('#ajustes-btn', '#ajustes-box'); alternar('#atr-editar', '#atr-box');
   $('#aumentos').onclick = abrirAumentos;
   $('#usar-surto').onclick = () => {
     if ((+P.surtosAtuais || 0) <= 0) return toast('Sem pulsos de cura restantes.', true);
     P.surtosAtuais--; P.pvAtual = Math.min(+CALC.pv, (+P.pvAtual || 0) + CALC.valorSurto);
     $('[data-bind=surtosAtuais]').value = P.surtosAtuais; $('[data-bind=pvAtual]').value = P.pvAtual; aplicarCalculo(); agendarSalvar();
   };
-  $('#desc-longo').onclick = () => { P.pvAtual = CALC.pv; P.surtosAtuais = CALC.surtos; log('descanso', 'Descanso longo.'); desenharAba(); agendarSalvar(); };
+  // descanso longo (regra do 4e): PV e pulsos cheios, 1 ponto de ação, marcos zerados; some o que só dura até lá
+  $('#desc-longo').onclick = () => {
+    Object.assign(P, { pvAtual: CALC.pv, surtosAtuais: CALC.surtos, pvTemp: 0, pontosAcao: 1, marcos: 0, segundoFolego: false, falhasMorte: {} });
+    log('descanso', 'Descanso longo.'); desenharAba(); agendarSalvar();
+  };
   $('#add-talento').onclick = () => escolher({ cats: ['feat'], titulo: 'Adicionar talentos', multi: true, onPickMulti: (sel) => {
     let n = 0;
     for (const { item: m } of sel) { if (P.talentos.some((t) => t.id === m.ID)) continue; P.talentos.push({ cat: 'feat', id: m.ID, nome: m.Name }); log('talento', 'Talento: ' + m.Name); n++; }

@@ -1,6 +1,6 @@
 {
   "name": "fichas-rpg",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "description": "Grimório do Aventureiro: fichas e anotações de D&D 4e com compêndio local",
   "main": "electron/main.mjs",
   "type": "module",
@@ -13,8 +13,8 @@
     "desktop:publicar": "electron-builder --win --publish always"
   },
   "dependencies": {
-    "@fontsource/cinzel": "^5.3.0",
-    "@fontsource/signika": "^5.3.0",
+    "@fontsource/alegreya": "^5.3.0",
+    "@fontsource/gothic-a1": "^5.3.0",
     "bootstrap": "^5.3.3",
     "electron-updater": "^6.8.9",
     "pdf-lib": "^1.17.1"

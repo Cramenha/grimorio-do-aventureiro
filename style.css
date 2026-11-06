@@ -1,39 +1,42 @@
-/* Grimório do Aventureiro — Material Design 3 (m3.material.io), paleta e mood inspirados em foundryvtt.com.
-   Ver DESIGN.md para as seed colors, a escala de forma e a escala tipográfica. Bootstrap faz o resto. */
+/* Grimório do Aventureiro — Material Design 3 (m3.material.io) com referência visual em baldursgate3.game.
+   Ver DESIGN.md para as sementes medidas no site, a escala de forma e a tipografia. Bootstrap faz o resto.
+   Contraste dos pares de texto conferido (AA) nos dois temas em 05/11/2026. */
 :root {
-  /* ---- cor: papéis M3, gerados a partir das seed colors em DESIGN.md ---- */
-  --md-primary: #f2a354; --md-on-primary: #4a2800; --md-primary-container: #6b3b0e; --md-on-primary-container: #ffdcb8;
-  --md-secondary: #d6bfae; --md-on-secondary: #3b2a1f; --md-secondary-container: #52392b; --md-on-secondary-container: #ecd9c9;
+  /* ---- cor: papéis M3. Escuro: preto do site, bronze dourado #C19976 como único acento ---- */
+  --md-primary: #c19976; --md-on-primary: #1d1003; --md-primary-container: #4a3520; --md-on-primary-container: #fbcea0;
+  --md-primary-bright: #fbcea0; /* realce do primary (hover do botão principal), medido no site */
+  --md-secondary: #b1906a; --md-on-secondary: #1d1003; --md-secondary-container: #3a2c1e; --md-on-secondary-container: #e8d2b8;
   --md-tertiary: #e5a19d; --md-on-tertiary: #3f0300; --md-tertiary-container: #5c1512; --md-on-tertiary-container: #ffdad4;
   --md-error: #f2b8b5; --md-on-error: #601410; --md-error-container: #8c1d18; --md-on-error-container: #f9dedc;
   --md-success-container: #1e4620; --md-on-success-container: #b7e8b4;
   --md-warning-container: #4a3200; --md-on-warning-container: #f6d9a8;
-  --md-surface-dim: #0b0a13; --md-surface: #121018; --md-surface-bright: #38353f;
-  --md-surface-container-lowest: #060509; --md-surface-container-low: #15131b; --md-surface-container: #19171f;
-  --md-surface-container-high: #242129; --md-surface-container-highest: #2f2c34;
-  --md-on-surface: #e7d1b1; --md-on-surface-variant: #cbb8a3;
-  --md-outline: #9f8475; --md-outline-variant: #4a4038;
+  --md-surface-dim: #000000; --md-surface: #080605; --md-surface-bright: #2e2720;
+  --md-surface-container-lowest: #000000; --md-surface-container-low: #0d0a08; --md-surface-container: #13100c;
+  --md-surface-container-high: #1b1611; --md-surface-container-highest: #251e17;
+  --md-on-surface: #ffffff; --md-on-surface-variant: #bdb3a7;
+  --md-outline: #b1906a; --md-outline-variant: #785f42;
   /* selos de tipo de poder (regra de D&D 4e, não decoração) */
   --md-atwill-container: #1e4620; --md-on-atwill-container: #b7e8b4;
   --md-encounter-container: #5c1512; --md-on-encounter-container: #ffdad4;
-  --md-daily-container: #2a2730; --md-on-daily-container: #d8d0e0;
-  --md-item-container: #6b3b0e; --md-on-item-container: #ffdcb8;
-  /* ---- forma: escala M3 ---- */
-  --shape-xs: 4px; --shape-sm: 8px; --shape-md: 12px; --shape-lg: 16px; --shape-xl: 28px; --shape-full: 999px;
-  /* ---- elevação: sombra M3 (reforço leve sobre a elevação por tom de superfície) ---- */
-  --elev-1: 0 1px 2px rgba(0,0,0,.4), 0 1px 3px 1px rgba(0,0,0,.2);
-  --elev-2: 0 1px 2px rgba(0,0,0,.4), 0 2px 6px 2px rgba(0,0,0,.2);
-  --elev-3: 0 4px 8px 3px rgba(0,0,0,.25), 0 1px 3px rgba(0,0,0,.4);
-  /* ---- tipografia: Display/Headline em Cinzel (identidade), Title/Body/Label em Signika (fonte real da Foundry) ---- */
-  --fonte-titulo: 'Cinzel', 'Palatino Linotype', serif;
-  --fonte-corpo: 'Signika', 'Palatino Linotype', sans-serif;
+  --md-daily-container: #2a2620; --md-on-daily-container: #e6dfd6;
+  --md-item-container: #4a3520; --md-on-item-container: #fbcea0;
+  /* ---- forma: o site do BG3 é reto (border-radius 0); 2px só em campo, chip e célula, para não serrilhar ---- */
+  --shape-xs: 2px; --shape-sm: 2px; --shape-md: 0; --shape-lg: 0; --shape-xl: 0; --shape-full: 999px;
+  /* ---- elevação: sombra M3 só em flutuantes (modal, janela de nota, menu) ---- */
+  --elev-1: 0 1px 2px rgba(0,0,0,.5), 0 1px 3px 1px rgba(0,0,0,.3);
+  --elev-2: 0 1px 2px rgba(0,0,0,.5), 0 2px 6px 2px rgba(0,0,0,.3);
+  --elev-3: 0 4px 8px 3px rgba(0,0,0,.35), 0 1px 3px rgba(0,0,0,.5);
+  /* ---- tipografia: Alegreya (análoga aberta da Quadraat do site) e Gothic A1 (a mesma do site) nos rótulos ---- */
+  --fonte-titulo: 'Alegreya', Georgia, serif;
+  --fonte-corpo: 'Alegreya', Georgia, serif;
+  --fonte-rotulo: 'Gothic A1', 'Segoe UI', sans-serif;
   color-scheme: dark;
 }
-/* Tema claro: mesmas sementes do DESIGN.md nos tons claros do M3 (o tema.js põe data-tema no <html>).
-   Pares de texto conferidos em AA (4,5:1). O selo "diário" continua escuro: preto é a cor da regra. */
+/* Tema claro: o site não tem; derivado das mesmas sementes em tons de pergaminho, bronze escuro como acento. */
 :root[data-tema="claro"] {
-  --md-primary: #8a4d0f; --md-on-primary: #ffffff; --md-primary-container: #ffdcb8; --md-on-primary-container: #2e1500;
-  --md-secondary: #6f5a4b; --md-on-secondary: #ffffff; --md-secondary-container: #f3dccb; --md-on-secondary-container: #281709;
+  --md-primary: #7a5530; --md-on-primary: #ffffff; --md-primary-container: #f3dcc2; --md-on-primary-container: #2b1a08;
+  --md-primary-bright: #5e3f1f;
+  --md-secondary: #6e5638; --md-on-secondary: #ffffff; --md-secondary-container: #eadbc8; --md-on-secondary-container: #261a0c;
   --md-tertiary: #9c3a33; --md-on-tertiary: #ffffff; --md-tertiary-container: #ffdad4; --md-on-tertiary-container: #410001;
   --md-error: #b3261e; --md-on-error: #ffffff; --md-error-container: #f9dedc; --md-on-error-container: #410e0b;
   --md-success-container: #c6ecc1; --md-on-success-container: #0b3a10;
@@ -41,12 +44,12 @@
   --md-surface-dim: #e3d9cd; --md-surface: #f7f1e9; --md-surface-bright: #fdf9f4;
   --md-surface-container-lowest: #fffdfa; --md-surface-container-low: #f5eee5; --md-surface-container: #f0e8de;
   --md-surface-container-high: #ebe2d6; --md-surface-container-highest: #e5dbce;
-  --md-on-surface: #2b1e14; --md-on-surface-variant: #56473b;
-  --md-outline: #85736a; --md-outline-variant: #d5c3b5;
+  --md-on-surface: #1f160e; --md-on-surface-variant: #54463a;
+  --md-outline: #8a7155; --md-outline-variant: #cdbba5;
   --md-atwill-container: #c6ecc1; --md-on-atwill-container: #0b3a10;
   --md-encounter-container: #ffdad4; --md-on-encounter-container: #5c1512;
-  --md-daily-container: #2f2c34; --md-on-daily-container: #ece6f0;
-  --md-item-container: #ffdcb8; --md-on-item-container: #2e1500;
+  --md-daily-container: #2a2620; --md-on-daily-container: #ece6f0;
+  --md-item-container: #f3dcc2; --md-on-item-container: #2b1a08;
   --elev-1: 0 1px 2px rgba(60,40,20,.18), 0 1px 3px 1px rgba(60,40,20,.08);
   --elev-2: 0 1px 2px rgba(60,40,20,.18), 0 2px 6px 2px rgba(60,40,20,.08);
   --elev-3: 0 4px 8px 3px rgba(60,40,20,.1), 0 1px 3px rgba(60,40,20,.18);
@@ -54,58 +57,73 @@
 }
 html, body { min-height: 100%; }
 body {
-  font-family: var(--fonte-corpo); font-size: 1.05rem; color: var(--md-on-surface);
+  font-family: var(--fonte-corpo); font-size: 1.08rem; color: var(--md-on-surface);
   background: var(--md-surface-dim);
+  font-variant-numeric: lining-nums; /* a Alegreya usa algarismos de texto por padrão; a ficha é tabela de números */
   background-attachment: fixed;
 }
-h1, h2, h3, h4, h5, .titulo { font-family: var(--fonte-titulo); letter-spacing: .03em; }
+input, textarea, select, button { font-variant-numeric: inherit; } /* campo de formulário não herda sozinho */
+h1, h2, h3, h4, h5, .titulo { font-family: var(--fonte-titulo); font-weight: 700; letter-spacing: .04em; }
 .invisivel { display: none !important; }
 :focus-visible { outline: 2px solid var(--md-primary); outline-offset: 2px; }
 
 /* ---------- barra superior ---------- */
 #topo { background: var(--md-surface-container); border-bottom: 1px solid var(--md-outline-variant); box-shadow: var(--elev-2); position: sticky; top: 0; z-index: 1030; }
 .marca { font-family: var(--fonte-titulo); font-weight: 700; font-size: 1.4rem; color: var(--md-on-surface); cursor: pointer; white-space: nowrap; }
-.marca small { display: block; font-size: .6rem; letter-spacing: .28em; color: var(--md-on-surface-variant); font-weight: 400; }
-#busca-global { background: var(--md-surface-container-lowest); border: 1px solid var(--md-outline); color: var(--md-on-surface); border-radius: var(--shape-full); padding-left: 1.1rem; }
+.marca small { display: block; font-family: var(--fonte-rotulo); font-size: .58rem; letter-spacing: .16em; color: var(--md-on-surface-variant); font-weight: 400; }
+#busca-global { background: var(--md-surface-container-lowest); border: 1px solid var(--md-outline); color: var(--md-on-surface); border-radius: var(--shape-xs); padding-left: .8rem; }
 #busca-global:focus { border-color: var(--md-primary); box-shadow: 0 0 0 1px var(--md-primary); }
 #busca-global::placeholder { color: var(--md-on-surface-variant); }
 #res-global { position: absolute; top: 100%; left: 0; right: 0; max-height: 60vh; overflow: auto; background: var(--md-surface-container-high); border: 1px solid var(--md-outline-variant); border-radius: var(--shape-md); z-index: 1050; box-shadow: var(--elev-3); }
 #res-global div { padding: .35rem .8rem; cursor: pointer; border-bottom: 1px solid var(--md-outline-variant); display: flex; gap: .6rem; align-items: baseline; }
 #res-global div:hover { background: var(--md-surface-container-highest); }
-#res-global .cat { font-size: .72rem; text-transform: uppercase; letter-spacing: .1em; color: var(--md-primary); min-width: 7.5rem; }
+#res-global .cat { font-family: var(--fonte-rotulo); font-size: .68rem; text-transform: uppercase; letter-spacing: .1em; color: var(--md-primary); min-width: 7.5rem; }
 #res-global .inf { color: var(--md-on-surface-variant); font-size: .9rem; margin-left: auto; }
 
-/* ---------- botões (M3: filled / tonal / text, forma estádio — dose-cap do antislop: só botão é pílula) ---------- */
+/* ---------- botões (medidos no site do BG3: retos, borda de 1px em bronze, texto dourado em caixa-alta).
+   M3 continua: filled (.btn-rpg, a ação principal da tela), outlined (.btn-rpg-sec) e text/mini (.btn-rpg-mini),
+   com state layer de 8% no hover e 10% no pressionado. ---------- */
 .btn-rpg, .btn-rpg-sec, .btn-rpg-mini {
-  font-family: var(--fonte-corpo); font-weight: 600; letter-spacing: .01em; border: 0; border-radius: var(--shape-full);
-  padding: .45rem 1.1rem; cursor: pointer; transition: background-color .15s, box-shadow .15s; box-shadow: var(--elev-1);
+  font-family: var(--fonte-titulo); font-weight: 700; letter-spacing: .04em; border: 1px solid transparent; border-radius: var(--shape-md);
+  padding: .4rem 1.05rem; cursor: pointer; transition: background-color .15s, color .15s, border-color .15s;
 }
-.btn-rpg { background: var(--md-primary); color: var(--md-on-primary); }
-.btn-rpg-sec { background: var(--md-secondary-container); color: var(--md-on-secondary-container); }
-.btn-rpg-mini { padding: .15rem .65rem; font-size: .8rem; background: transparent; color: var(--md-on-surface-variant); border: 1px solid var(--md-outline); box-shadow: none; }
-.btn-rpg:hover { background: color-mix(in srgb, var(--md-primary) 92%, white); }
-.btn-rpg-sec:hover { background: color-mix(in srgb, var(--md-secondary-container) 88%, white); }
-.btn-rpg-mini:hover { background: color-mix(in srgb, var(--md-outline) 14%, transparent); }
-.btn-rpg:active, .btn-rpg-sec:active, .btn-rpg-mini:active { box-shadow: none; }
+.btn-rpg, .btn-rpg-sec { text-transform: uppercase; font-size: .92rem; }
+.btn-rpg { background: var(--md-primary); color: var(--md-on-primary); border-color: var(--md-primary); }
+.btn-rpg-sec { background: var(--md-surface-container-low); color: var(--md-primary); border-color: var(--md-outline); }
+.btn-rpg-mini { padding: .12rem .6rem; font-family: var(--fonte-corpo); font-weight: 600; font-size: .85rem; letter-spacing: 0; background: transparent; color: var(--md-on-surface-variant); border-color: var(--md-outline-variant); border-radius: var(--shape-xs); }
+.btn-rpg:hover { background: var(--md-primary-bright); border-color: var(--md-primary-bright); }
+.btn-rpg-sec:hover { background: color-mix(in srgb, var(--md-primary) 8%, var(--md-surface-container-low)); border-color: var(--md-primary); }
+.btn-rpg-mini:hover { background: color-mix(in srgb, var(--md-primary) 8%, transparent); color: var(--md-on-surface); border-color: var(--md-outline); }
+.btn-rpg-sec:active { background: color-mix(in srgb, var(--md-primary) 10%, var(--md-surface-container-low)); }
+.btn-rpg-mini:active { background: color-mix(in srgb, var(--md-primary) 10%, transparent); }
 .btn-rpg:disabled, .btn-rpg-sec:disabled, .btn-rpg-mini:disabled { opacity: .38; cursor: wait; box-shadow: none; }
 
-/* ---------- "folha": cartão de superfície elevada (ficha, modal, cartão) ---------- */
+/* ---------- "folha": contêiner de primeiro nível (quadro da ficha, modal, cartão da tela inicial) ----------
+   Moldura do BG3: fio de 1px em bronze escuro com os quatro cantos marcados por um L de 2px em bronze claro.
+   Os cantos são 8 gradientes sobre a própria borda (sem SVG nem imagem); só neste nível, nunca em aninhado. */
 .folha, .modal-content.folha {
+  --canto: var(--md-outline); --canto-l: 14px; --canto-e: 2px;
   position: relative; color: var(--md-on-surface);
-  background: var(--md-surface-container-high);
+  background-color: var(--md-surface-container-high);
+  background-image: linear-gradient(var(--canto), var(--canto)), linear-gradient(var(--canto), var(--canto)), linear-gradient(var(--canto), var(--canto)), linear-gradient(var(--canto), var(--canto)),
+    linear-gradient(var(--canto), var(--canto)), linear-gradient(var(--canto), var(--canto)), linear-gradient(var(--canto), var(--canto)), linear-gradient(var(--canto), var(--canto));
+  background-position: left top, left top, right top, right top, left bottom, left bottom, right bottom, right bottom;
+  background-size: var(--canto-l) var(--canto-e), var(--canto-e) var(--canto-l), var(--canto-l) var(--canto-e), var(--canto-e) var(--canto-l),
+    var(--canto-l) var(--canto-e), var(--canto-e) var(--canto-l), var(--canto-l) var(--canto-e), var(--canto-e) var(--canto-l);
+  background-repeat: no-repeat; background-origin: border-box; background-clip: border-box;
   border: 1px solid var(--md-outline-variant); border-radius: var(--shape-lg); padding: 1.25rem 1.5rem;
-  box-shadow: var(--elev-2);
 }
-/* cartões aninhados (anotações, cartas da tela inicial): um tom acima, hierarquia por superfície, não por moldura */
-.folha .folha, .cartao-pers.folha { padding: .9rem 1.2rem !important; background: var(--md-surface-container-highest); border-radius: var(--shape-md); }
-.folha .folha { border-width: 1px; box-shadow: var(--elev-1); }
+.modal-content.folha { box-shadow: var(--elev-3); } /* o modal flutua de verdade; o quadro da página não */
+.cartao-pers.folha { padding: .9rem 1.2rem !important; }
+/* cartões aninhados (anotações dentro de um quadro): um tom acima, sem moldura de cantos */
+.folha .folha { padding: .9rem 1.2rem !important; background: var(--md-surface-container-highest); border-radius: var(--shape-md); border-width: 1px; }
 .folha > * { position: relative; }
 .folha h2, .folha h3, .folha h4, .folha h5 { color: var(--md-primary); border-bottom: 1px solid var(--md-outline-variant); padding-bottom: .15rem; margin-bottom: .6rem; }
 .folha h2 { font-size: 1.35rem; } .folha h3 { font-size: 1.15rem; } .folha h4 { font-size: 1.05rem; }
 .folha .text-muted, .folha small { color: var(--md-on-surface-variant) !important; }
 .folha a { color: var(--md-primary); }
 .folha hr { border-top: 1px solid var(--md-outline-variant); opacity: .7; }
-.rotulo { font-family: var(--fonte-corpo); font-size: .7rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--md-on-surface-variant); }
+.rotulo { font-family: var(--fonte-rotulo); font-size: .66rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--md-on-surface-variant); }
 
 /* campos de formulário (M3 outlined text field) */
 .folha .form-control, .folha .form-select, .campo {
@@ -128,7 +146,7 @@ h1, h2, h3, h4, h5, .titulo { font-family: var(--fonte-titulo); letter-spacing: 
 #retrato { width: 96px; height: 96px; border-radius: 50%; border: 2px solid var(--md-primary); box-shadow: var(--elev-2); background: var(--md-surface-container) center/cover; cursor: pointer; display: grid; place-items: center; font-size: 2.6rem; }
 .nome-grande { font-family: var(--fonte-titulo); font-size: 2rem; font-weight: 700; background: transparent !important; border: 0 !important; border-bottom: 1px dashed var(--md-outline) !important; color: var(--md-on-surface) !important; width: 100%; padding: 0; }
 .abas { display: flex; gap: .3rem; flex-wrap: wrap; margin: 1rem 0 .6rem; border-bottom: 1px solid var(--md-outline-variant); }
-.aba { font-family: var(--fonte-corpo); font-weight: 600; padding: .5rem 1.1rem; cursor: pointer; background: transparent; color: var(--md-on-surface-variant); border: 0; border-bottom: 3px solid transparent; }
+.aba { font-family: var(--fonte-titulo); font-weight: 700; text-transform: uppercase; letter-spacing: .04em; padding: .5rem 1.1rem; cursor: pointer; background: transparent; color: var(--md-on-surface-variant); border: 0; border-bottom: 3px solid transparent; }
 .aba:hover { color: var(--md-on-surface); background: color-mix(in srgb, var(--md-on-surface) 6%, transparent); }
 .aba.ativa { color: var(--md-primary); border-bottom-color: var(--md-primary); }
 
@@ -154,7 +172,7 @@ h1, h2, h3, h4, h5, .titulo { font-family: var(--fonte-titulo); letter-spacing: 
 .lista-item .nm { flex: 1; cursor: pointer; font-weight: 600; }
 .lista-item .nm:hover { color: var(--md-primary); text-decoration: underline; }
 /* selos (M3 chip, shape-sm — diferente do botão, que é estádio) */
-.tag { font-family: var(--fonte-corpo); font-weight: 600; font-size: .65rem; padding: .08rem .5rem; border-radius: var(--shape-sm); text-transform: uppercase; letter-spacing: .06em; }
+.tag { font-family: var(--fonte-rotulo); font-weight: 600; font-size: .62rem; padding: .08rem .5rem; border-radius: var(--shape-sm); text-transform: uppercase; letter-spacing: .06em; }
 .tag.atwill { background: var(--md-atwill-container); color: var(--md-on-atwill-container); }
 .tag.encounter { background: var(--md-encounter-container); color: var(--md-on-encounter-container); }
 .tag.daily { background: var(--md-daily-container); color: var(--md-on-daily-container); }
@@ -162,13 +180,63 @@ h1, h2, h3, h4, h5, .titulo { font-family: var(--fonte-titulo); letter-spacing: 
 .barra-vida { height: 10px; border-radius: var(--shape-full); background: var(--md-surface-container-highest); overflow: hidden; }
 .barra-vida > i { display: block; height: 100%; background: var(--md-error); transition: width .2s; }
 
+/* ---------- aba Ficha no arranjo da ficha em PDF do Character Builder ----------
+   Quadros com título em caixa-alta centralizado (a faixa preta do CB, em tom de superfície), caixas de valor com o
+   rótulo em cima e a caixa de atributo da ficha do D&D Beyond (modificador grande, valor no oval). */
+.ficha-cb .coluna-cb { display: flex; flex-direction: column; gap: 1rem; }
+.ficha-cb > .bloco { margin-bottom: 1rem; }
+.folha.bloco { padding: 0; overflow: hidden; }
+.bloco .bloco-tit { margin: 0; padding: .4rem .8rem; text-align: center; font-family: var(--fonte-titulo); font-size: 1rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+  color: var(--md-primary); background: var(--md-surface-container-highest); border-bottom: 1px solid var(--md-outline-variant); }
+.bloco-corpo { padding: .75rem .9rem .85rem; }
+.linha-placar { display: flex; align-items: flex-end; gap: .6rem; }
+.linha-placar + .linha-placar { margin-top: .6rem; }
+/* as células dividem o que sobra ao lado do total, como as caixas da linha de defesa do CB */
+.linha-cel { display: flex; flex: 1; min-width: 0; gap: .25rem; align-items: flex-end; }
+.linha-cel .cel { flex: 1 1 0; min-width: 0; }
+.linha-cel .cel-v { min-width: 0; }
+.placar { display: flex; flex-direction: column; align-items: center; min-width: 4.2rem; }
+.placar-r, .cel-r { font-family: var(--fonte-rotulo); font-size: .6rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--md-on-surface-variant); text-align: center; line-height: 1.15; margin-bottom: .2rem; }
+.placar-v { display: block; min-width: 3.6rem; padding: .15rem .5rem; text-align: center; font-family: var(--fonte-titulo); font-weight: 700; font-size: 1.65rem; line-height: 1.25;
+  color: var(--md-on-surface); background: var(--md-surface-container-lowest); border: 2px solid var(--md-outline); border-radius: var(--shape-md); cursor: help; white-space: nowrap; }
+.cel { display: flex; flex-direction: column; align-items: center; min-width: 2.6rem; }
+.cel-v { display: block; width: 100%; min-width: 2.6rem; height: 1.85rem; line-height: 1.75rem; text-align: center; font-weight: 700; color: var(--md-on-surface);
+  border: 1px solid var(--md-outline-variant); border-radius: var(--shape-xs); background: var(--md-surface-container); padding: 0 .3rem; }
+.campo-linha { display: block; margin-top: .55rem; }
+.campo-linha .rotulo { display: block; margin-bottom: .1rem; }
+.folha .form-control.campo-grande { font-family: var(--fonte-titulo); font-weight: 700; font-size: 1.35rem; text-align: center; }
+.marca-uso { display: flex; align-items: center; gap: .4rem; min-height: 2.1rem; font-size: .95rem; }
+.def-bloco + .def-bloco { margin-top: .8rem; padding-top: .7rem; border-top: 1px dotted var(--md-outline-variant); }
+.def-bloco .campo-linha { margin-top: .35rem; }
+/* atributos: três colunas, cada uma um par (FOR/CON, DES/INT, SAB/CAR), como o CB agrupa por defesa */
+.atr-grade { display: grid; grid-template-columns: repeat(3, 1fr); gap: .6rem; margin-bottom: 1.5rem; }
+.atr-par { display: flex; flex-direction: column; gap: 1.2rem; }
+.atr-caixa { position: relative; display: flex; flex-direction: column; align-items: center; padding: .35rem .25rem 1.15rem; text-align: center;
+  background: var(--md-surface-container); border: 1px solid var(--md-outline); border-radius: var(--shape-md); }
+.atr-nome { font-family: var(--fonte-rotulo); font-size: .6rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--md-on-surface-variant); }
+.atr-mod { font-family: var(--fonte-titulo); font-weight: 700; font-size: 1.9rem; line-height: 1.15; color: var(--md-on-surface); }
+.atr-valor { position: absolute; bottom: -.8rem; left: 50%; transform: translateX(-50%); min-width: 2.6rem; padding: 0 .45rem; font-weight: 700; line-height: 1.45rem;
+  color: var(--md-on-surface); background: var(--md-surface-container-lowest); border: 1px solid var(--md-outline); border-radius: var(--shape-full); }
+.atr-teste { position: absolute; bottom: -1.95rem; left: 0; right: 0; font-size: .68rem; color: var(--md-on-surface-variant); }
+.atr-teste b { color: var(--md-on-surface); }
+.atr-par .atr-caixa { margin-bottom: .75rem; }
+.tabela-pericias th { text-align: center; font-size: .6rem; letter-spacing: .04em; }
+.tabela-pericias th:nth-child(2) { text-align: left; }
+.tabela-pericias td { padding: .1rem .2rem; }
+.tabela-pericias td.nome-per small { color: var(--md-on-surface-variant); font-size: .68rem; letter-spacing: .05em; }
+.tabela-pericias input[type=number] { width: 2.8rem; }
+.ajuda { cursor: help; }
+.atq + .atq { margin-top: .9rem; padding-top: .8rem; border-top: 1px dotted var(--md-outline-variant); }
+.atq-nome { margin-bottom: .4rem; }
+.atq + p.rotulo, .atq ~ p.rotulo { margin-top: .7rem; }
+
 .pt-nome { color: var(--md-on-surface-variant); font-style: italic; font-size: .92em; }
 .num-escudo { font-family: var(--fonte-titulo); font-weight: 700; font-size: 1.7rem; color: var(--md-on-surface); line-height: 1.2; cursor: help; }
 .num-calc { font-family: var(--fonte-titulo); font-weight: 700; font-size: 1.35rem; color: var(--md-primary); border-bottom: 1px solid var(--md-outline-variant); text-align: center; background: var(--md-surface-container); cursor: help; }
 .aviso { background: var(--md-warning-container); border: 1px solid var(--md-outline); color: var(--md-on-warning-container); border-radius: var(--shape-xs); padding: .15rem .6rem; margin-top: .25rem; font-size: .95rem; }
-.tabela-atr th { font-family: var(--fonte-corpo); font-size: .7rem; text-transform: uppercase; color: var(--md-on-surface-variant); text-align: center; }
+.tabela-atr th { font-family: var(--fonte-rotulo); font-size: .62rem; text-transform: uppercase; color: var(--md-on-surface-variant); text-align: center; }
 .tabela-atr td.mod { color: var(--md-primary); }
-.tabela-per th { font-family: var(--fonte-corpo); font-size: .7rem; text-transform: uppercase; color: var(--md-on-surface-variant); }
+.tabela-per th { font-family: var(--fonte-rotulo); font-size: .62rem; text-transform: uppercase; color: var(--md-on-surface-variant); }
 .carta h1 .pt { font-weight: 400; }
 
 /* ---------- texto do compêndio (cartas) ---------- */
@@ -180,7 +248,7 @@ h1, h2, h3, h4, h5, .titulo { font-family: var(--fonte-titulo); letter-spacing: 
 .carta h1.encounterpower { background: var(--md-encounter-container); color: var(--md-on-encounter-container); }
 .carta h1.dailypower { background: var(--md-daily-container); color: var(--md-on-daily-container); }
 .carta h1.player, .carta h1.mihead, .carta h1.monster, .carta h1 { background-color: var(--md-surface-container-highest); }
-.btn-macro { font: 600 .62rem/1 var(--fonte-corpo, inherit); letter-spacing: .06em; padding: .15rem .35rem; margin-left: .4rem; border: 1px solid var(--md-outline); border-radius: var(--shape-xs); background: transparent; color: var(--md-on-surface-variant); opacity: .55; cursor: pointer; white-space: nowrap; }
+.btn-macro { font: 600 .6rem/1 var(--fonte-rotulo, inherit); letter-spacing: .06em; padding: .15rem .35rem; margin-left: .4rem; border: 1px solid var(--md-outline); border-radius: var(--shape-xs); background: transparent; color: var(--md-on-surface-variant); opacity: .55; cursor: pointer; white-space: nowrap; }
 .menu-macro { position: absolute; z-index: 2000; min-width: 220px; max-width: 320px; background: var(--md-surface-container-high); border: 1px solid var(--md-outline-variant); border-radius: var(--shape-sm); box-shadow: var(--elev-3); padding: .25rem; display: flex; flex-direction: column; gap: .15rem; }
 .menu-macro button { text-align: left; background: transparent; border: 0; border-radius: var(--shape-xs); padding: .3rem .5rem; font-size: .8rem; color: var(--md-on-surface); cursor: pointer; }
 .menu-macro button:hover { background: color-mix(in srgb, var(--md-primary) 14%, transparent); }
@@ -212,10 +280,10 @@ body.gr-pagina #gr-pagina .modal-content { height: 100vh; min-height: 0; border-
 #grimorio .modal-content, #gr-pagina .modal-content { min-height: 92vh; background: var(--md-surface-container); border: 1px solid var(--md-outline-variant); border-radius: var(--shape-xl); color: var(--md-on-surface); padding: 0; box-shadow: var(--elev-3); }
 #grimorio .barra, #gr-pagina .barra { padding: .8rem 1.2rem; border-bottom: 1px solid var(--md-outline-variant); display: flex; gap: .8rem; align-items: center; flex-wrap: wrap; background: var(--md-surface-container-high); position: sticky; top: 0; z-index: 3; }
 #grimorio .barra h3, #gr-pagina .barra h3 { margin: 0; color: var(--md-primary); font-size: 1.4rem; }
-.filtro { font-family: var(--fonte-corpo); font-weight: 600; font-size: .8rem; border: 1px solid var(--md-outline); background: transparent; color: var(--md-on-surface-variant); padding: .2rem .8rem; border-radius: var(--shape-sm); cursor: pointer; }
+.filtro { font-family: var(--fonte-rotulo); font-weight: 600; font-size: .74rem; border: 1px solid var(--md-outline); background: transparent; color: var(--md-on-surface-variant); padding: .2rem .8rem; border-radius: var(--shape-sm); cursor: pointer; }
 .filtro.on { background: var(--md-primary-container); color: var(--md-on-primary-container); border-color: transparent; }
 .secao-poder { padding: .8rem 1.2rem 0; }
-.secao-poder > h4 { color: var(--md-primary); font-size: 1.15rem; border-bottom: 1px solid var(--md-outline-variant); padding-bottom: .2rem; letter-spacing: .15em; text-transform: uppercase; }
+.secao-poder > h4 { color: var(--md-primary); font-size: 1.15rem; border-bottom: 1px solid var(--md-outline-variant); padding-bottom: .2rem; letter-spacing: .06em; text-transform: uppercase; }
 .grade-cartas { columns: 380px; column-gap: 1.1rem; padding-bottom: 1rem; }
 .grade-cartas .carta-pod { break-inside: avoid; margin-bottom: 1.1rem; color: var(--md-on-surface); background: var(--md-surface-container-high); border-radius: var(--shape-md); box-shadow: var(--elev-2); position: relative; }
 .grade-cartas .carta-pod .acoes { display: flex; gap: .4rem; justify-content: flex-end; padding: .3rem .5rem; background: var(--md-surface-container-highest); border-radius: 0 0 var(--shape-md) var(--shape-md); }
@@ -266,7 +334,7 @@ body.gr-pagina #gr-pagina .modal-content { height: 100vh; min-height: 0; border-
 .sb-tab { width: 100%; border-collapse: collapse; }
 .sb-tab td { padding: .2rem .8rem; border-bottom: 1px solid var(--md-outline-variant); }
 .sb-tab td.dir { text-align: right; }
-.sb h2 { margin: 0; background: var(--md-encounter-container); color: var(--md-on-encounter-container); font-family: var(--fonte-corpo); font-size: .8rem; letter-spacing: .08em; text-transform: uppercase; padding: .1rem .8rem; }
+.sb h2 { margin: 0; background: var(--md-encounter-container); color: var(--md-on-encounter-container); font-family: var(--fonte-rotulo); font-size: .8rem; letter-spacing: .08em; text-transform: uppercase; padding: .1rem .8rem; }
 .sb-poder { padding: .2rem .8rem .3rem; border-bottom: 1px solid var(--md-outline-variant); }
 .sb-poder p { margin: .1rem 0; }
 .sb-cab { background: var(--md-surface-container-highest); padding: .1rem .4rem; border-radius: var(--shape-xs); }
@@ -297,3 +365,8 @@ textarea.campo-auto { resize: vertical; overflow-y: auto; min-height: 2.1rem; ma
 .stats-poder .riscado { text-decoration: line-through; opacity: .6; }
 
 .btn-discreto { opacity: .55; padding: .1rem .5rem; } .btn-discreto:hover { opacity: 1; }
+/* dado de dano um pouco menor que o placar: "1d12+7" é mais largo que um número */
+.placar-v .dado { font-size: 1.35rem; }
+/* bônus situacionais do CB ("Special Movement", "Conditional Bonuses"): texto da ficha, não campo */
+.cond-cb { list-style: none; margin: .45rem 0 0; padding: 0; font-size: .92rem; color: var(--md-on-surface); }
+.cond-cb li + li { margin-top: .15rem; }

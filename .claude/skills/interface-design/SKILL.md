@@ -9,7 +9,7 @@ description: Desenho de interface com acabamento para o Grimório do Aventureiro
 
 ## O que governa o quê
 
-1. **`DESIGN.md`**: direção (Material Design 3, tema escuro inspirado no foundryvtt.com, âmbar como único acento, Cinzel nos títulos, Signika no corpo, escala de forma, elevação por tom de superfície, dials ENERGY 2 / RHYTHM 2 / MOTION 2). Em conflito com esta skill, vale o `DESIGN.md`.
+1. **`DESIGN.md`**: direção (Material Design 3, referência visual em baldursgate3.game, bronze dourado como único acento, Alegreya nos títulos e no corpo, Gothic A1 nos rótulos, cantos retos com moldura de 1px, elevação por tom de superfície, dials ENERGY 2 / RHYTHM 2 / MOTION 2). Em conflito com esta skill, vale o `DESIGN.md`.
 2. **antislop** (bloco no fim do `CLAUDE.md`): filtro. Roda junto, inclusive o Delivery Gate.
 3. **Esta skill**: como transformar a direção em tela sem cair no genérico.
 
